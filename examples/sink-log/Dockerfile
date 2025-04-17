@@ -1,25 +1,20 @@
-FROM rust:1.70 as build
+FROM rust:1.84-bullseye AS build
 
 RUN apt-get update
 RUN apt-get install protobuf-compiler -y
 
-# create a new empty shell project
-WORKDIR /examples
-
-# copy your source tree
-COPY src ./src
-
-COPY ./Cargo.toml ./Cargo.toml
-COPY ./Cargo.lock ./Cargo.lock
+WORKDIR /numaflow-rs
+COPY ./ ./
+WORKDIR /numaflow-rs/examples/sink-log
 
 # build for release
 RUN cargo build --release
 
 # our final base
-FROM rust
+FROM debian:bullseye AS sink-log
 
 # copy the build artifact from the build stage
-COPY --from=build /examples/target/release/server .
+COPY --from=build /numaflow-rs/target/release/sink-log .
 
 # set the startup command to run your binary
-CMD ["./server"]
+CMD ["./sink-log"]

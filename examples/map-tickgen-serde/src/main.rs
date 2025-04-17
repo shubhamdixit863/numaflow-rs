@@ -1,13 +1,12 @@
+use chrono::{SecondsFormat, TimeZone, Utc};
 use numaflow::map;
 use numaflow::map::Message;
+use serde::Serialize;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     map::Server::new(TickGen).start().await
 }
-
-use chrono::{SecondsFormat, TimeZone, Utc};
-use serde::Serialize;
 
 struct TickGen;
 
@@ -32,7 +31,7 @@ struct ResultPayload {
 
 #[tonic::async_trait]
 impl map::Mapper for TickGen {
-    async fn map(&self, input: map::MapRequest) -> Vec<map::Message> {
+    async fn map(&self, input: map::MapRequest) -> Vec<Message> {
         let Ok(payload) = serde_json::from_slice::<Payload>(&input.value) else {
             return vec![];
         };
@@ -46,8 +45,7 @@ impl map::Mapper for TickGen {
             })
             .unwrap_or_default(),
         )
-        .keys(input.keys)
-        .tags(vec![]);
+        .with_keys(input.keys.clone());
         vec![message]
     }
 }

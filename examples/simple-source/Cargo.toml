@@ -3,13 +3,8 @@ name = "simple-source"
 version = "0.1.0"
 edition = "2021"
 
-[[bin]]
-name = "server"
-path = "src/main.rs"
-
 [dependencies]
-tonic = "0.10.2"
+tonic = "0.13.0"
 tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
-numaflow = { git = "https://github.com/numaproj/numaflow-rs.git", branch = "main" }
-chrono = "0.4.30"
-uuid = "1.2.0"
+numaflow = { path = "../../numaflow" }
+chrono = "0.4.38"
